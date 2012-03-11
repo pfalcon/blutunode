@@ -40,6 +40,7 @@ static struct MsgDescription {
     MSG_DESC(CL_DM_ACL_CLOSED_IND, "ACL connection closed"),
     MSG_DESC(CL_SM_PIN_CODE_IND, "Pin code request from a remote"),
     MSG_DESC(CL_SM_AUTHENTICATE_CFM, "Authentication result of remote device"),
+    MSG_DESC(CL_SM_AUTHORISE_IND, "Authorize request for a remote trying to access service in security mode 2"),
     {0}
 };
 
@@ -95,6 +96,15 @@ static void print_message(MessageId msg_id, Message msg)
             PRINT(("Bonded=%d\n", tmsg->bonded));
             break;
         }
+    case CL_SM_AUTHORISE_IND:
+        {
+            CAST_TYPED_MSG(CL_SM_AUTHORISE_IND, tmsg);
+            print_bdaddr(tmsg->bd_addr);
+            PRINT(("Incoming=%d\n", tmsg->incoming));
+            PRINT(("Protocol=%d\n", tmsg->protocol_id));
+            PRINT(("Channel=%ld\n", tmsg->channel));
+            break;
+        }
     }
 }
 
@@ -113,6 +123,12 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             CAST_TYPED_MSG(CL_SM_PIN_CODE_IND, tmsg);
             ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, "1234");
+        }
+        break;
+    case CL_SM_AUTHORISE_IND:
+        {
+            CAST_TYPED_MSG(CL_SM_AUTHORISE_IND, tmsg);
+            ConnectionSmAuthoriseResponse(&tmsg->bd_addr, tmsg->protocol_id, tmsg->channel, tmsg->incoming, TRUE);
         }
         break;
     }
