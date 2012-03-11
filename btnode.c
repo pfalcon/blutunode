@@ -171,6 +171,21 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             ConnectionRfcommConnectResponse(task, TRUE, &tmsg->bd_addr, tmsg->server_channel, NULL);
         }
         break;
+    case MESSAGE_MORE_DATA:
+        {
+            MessageMoreData *tmsg = (MessageMoreData*)msg;
+            Source src = tmsg->source;
+            static char buf[80];
+            int size;
+            while ((size = SourceSize(src)) > 0) {
+                uint8 *p = SourceMap(src);
+                memcpy(buf, p, size);
+                buf[size] = 0;
+                SourceDrop(src, size);
+                PRINT(("Received: %s==\n", buf));
+            }
+        }
+        break;
     }
 }
 
