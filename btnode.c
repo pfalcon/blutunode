@@ -35,9 +35,9 @@ static struct MsgDescription {
 } MSG_DESCRIPTIONS[] = {
     MSG_DESC(CL_INIT_CFM, "ConnectLib Initialized"),
     MSG_DESC(CL_RFCOMM_REGISTER_CFM, "RFCOMM Channel Allocated"),
-    MSG_DESC(CL_DM_READ_BT_VERSION_CFM, ""),
-    MSG_DESC(CL_DM_ACL_OPENED_IND, ""),
-    MSG_DESC(CL_DM_ACL_CLOSED_IND, ""),
+/*    MSG_DESC(CL_DM_READ_BT_VERSION_CFM, ""),*/
+    MSG_DESC(CL_DM_ACL_OPENED_IND, "ACL connection opened"),
+    MSG_DESC(CL_DM_ACL_CLOSED_IND, "ACL connection closed"),
     {0}
 };
 
