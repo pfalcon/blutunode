@@ -152,6 +152,25 @@ static void print_message(MessageId msg_id, Message msg)
     }
 }
 
+static void sink_write(Sink sink, char *buf, int size)
+{
+    int offset = SinkClaim(sink, size);
+    uint8 *dest = SinkMap(sink);
+    memcpy(dest + offset, buf, size);
+    SinkFlush(sink, size);
+}
+
+static void sink_write_str(Sink sink, char *str)
+{
+    sink_write(sink, str, strlen(str));
+}
+
+static void process_line(Sink sink, char *line)
+{
+    sink_write_str(sink, "Received: ");
+    sink_write_str(sink, line);
+    sink_write_str(sink, "\r\n");
+}
 
 static void task_handler(Task task, MessageId msg_id, Message msg)
 {
@@ -193,28 +212,21 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
                 char c = 0;
                 for (i = size; i; i--) {
                     c = *p++;
-                    printf("%x ", c);
+                    /*printf("%x ", c);*/
                     *self->buf_ptr++ = c;
                     processed_size++;
                     if (c == '\r') {
-                        /*break;*/
+                        break;
                     }
                 }
                 SourceDrop(src, processed_size);
                 if (c == '\r') {
-                    *self->buf_ptr++ = 0;
+                    self->buf_ptr[-1] = 0;
                     PRINT(("Received: %s==\n", self->input_buf));
+                    process_line(StreamSinkFromSource(src), self->input_buf);
                     self->buf_ptr = self->input_buf;
                 }
             }
-            /*{
-                static char str[] = "response\r\n";
-                Sink sink = StreamSinkFromSource(src);
-                int offset = SinkClaim(sink, strlen(str));
-                uint8 *dest = SinkMap(sink);
-                memcpy(dest + offset, str, strlen(str));
-                SinkFlush(sink, strlen(str));
-            }*/
         }
         break;
     }
