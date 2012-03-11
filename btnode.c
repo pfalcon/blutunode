@@ -20,9 +20,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <print.h>
 #include <message.h>
 #include <connection.h>
+#include <source.h>
+#include <sink.h>
+#include <stream.h>
 
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
@@ -178,11 +182,19 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             static char buf[80];
             int size;
             while ((size = SourceSize(src)) > 0) {
-                uint8 *p = SourceMap(src);
+                const uint8 *p = SourceMap(src);
                 memcpy(buf, p, size);
                 buf[size] = 0;
                 SourceDrop(src, size);
                 PRINT(("Received: %s==\n", buf));
+            }
+            {
+                static char str[] = "response\r\n";
+                Sink sink = StreamSinkFromSource(src);
+                int offset = SinkClaim(sink, strlen(str));
+                uint8 *dest = SinkMap(sink);
+                memcpy(dest + offset, str, strlen(str));
+                SinkFlush(sink, strlen(str));
             }
         }
         break;
