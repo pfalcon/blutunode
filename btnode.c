@@ -16,13 +16,26 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define DEBUG_PRINT_ENABLED
+
 #include <stdio.h>
+#include <print.h>
 #include <message.h>
 #include <connection.h>
 
+static void print_message(MessageId msg_id, Message msg)
+{
+    switch (msg_id){
+    case CL_INIT_CFM:
+        PRINT(("CL_INIT_CFM (ConnectLib Initialzied)\n"));
+        break;
+    }
+}
+
+
 static void task_handler(Task task, MessageId msg_id, Message msg)
 {
-    printf("Msg: %x\n", msg_id);
+    print_message(msg_id, msg);
 }
 
 int main(void)
