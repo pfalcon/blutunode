@@ -26,27 +26,45 @@
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
 
+#define MSG_DESC(msg_id, desc) {msg_id, #msg_id, desc}
+static struct MsgDescription {
+    MessageId msg_id;
+    char *name;
+    char *desc;
+} MSG_DESCRIPTIONS[] = {
+    MSG_DESC(CL_INIT_CFM, "ConnectLib Initialized"),
+    MSG_DESC(CL_RFCOMM_REGISTER_CFM, "RFCOMM Channel Allocated"),
+    {0}
+};
+
 static void print_message(MessageId msg_id, Message msg)
 {
+    struct MsgDescription *p;
+    for (p = MSG_DESCRIPTIONS; p->msg_id; p++) {
+        if (p->msg_id == msg_id) {
+            PRINT(("Message: %#x %s (%s)\n", p->msg_id, p->name, p->desc));
+            break;
+        }
+    }
+    if (!p->msg_id) {
+        PRINT(("Unknown message: %#x\n", msg_id));
+        return;
+    }
+    
     switch (msg_id){
     case CL_INIT_CFM:
         {
             CAST_TYPED_MSG(CL_INIT_CFM, tmsg);
-            PRINT(("CL_INIT_CFM (ConnectLib Initialized)\n"));
             print_status(tmsg->status);
             break;
         }
     case CL_RFCOMM_REGISTER_CFM:
         {
             CAST_TYPED_MSG(CL_RFCOMM_REGISTER_CFM, tmsg);
-            PRINT(("CL_RFCOMM_REGISTER_CFM (RFCOMM Channel Allocated)\n"));
             print_status(tmsg->status);
             PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
             break;
         }
-    default:
-        PRINT(("Unknown message: %x\n", msg_id));
-        break;
     }
 }
 
