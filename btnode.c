@@ -44,6 +44,8 @@ static struct MsgDescription {
     MSG_DESC(CL_SM_AUTHORISE_IND, "Authorize request for a remote trying to access service in security mode 2"),
     MSG_DESC(CL_RFCOMM_CONNECT_IND, "RFCOMM connection request from a remote"),
     MSG_DESC(CL_RFCOMM_CONNECT_CFM, "RFCOMM connection result"),
+    MSG_DESC(MESSAGE_MORE_DATA, "More data available in source"),
+    MSG_DESC(MESSAGE_MORE_SPACE, "More space available in sink"),
     {0}
 };
 
@@ -123,6 +125,18 @@ static void print_message(MessageId msg_id, Message msg)
             PRINT(("Incoming=%d\n", tmsg->incoming));
             PRINT(("Protocol=%d\n", tmsg->protocol_id));
             PRINT(("Channel=%ld\n", tmsg->channel));
+            break;
+        }
+    case MESSAGE_MORE_DATA:
+        {
+            MessageMoreData *tmsg = (MessageMoreData*)msg;
+            PRINT(("Source=%x\n", tmsg->source));
+            break;
+        }
+    case MESSAGE_MORE_SPACE:
+        {
+            MessageMoreSpace *tmsg = (MessageMoreSpace*)msg;
+            PRINT(("Sink=%x\n", tmsg->sink));
             break;
         }
     }
