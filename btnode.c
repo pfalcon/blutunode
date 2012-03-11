@@ -41,6 +41,8 @@ static struct MsgDescription {
     MSG_DESC(CL_SM_PIN_CODE_IND, "Pin code request from a remote"),
     MSG_DESC(CL_SM_AUTHENTICATE_CFM, "Authentication result of remote device"),
     MSG_DESC(CL_SM_AUTHORISE_IND, "Authorize request for a remote trying to access service in security mode 2"),
+    MSG_DESC(CL_RFCOMM_CONNECT_IND, "RFCOMM connection request from a remote"),
+    MSG_DESC(CL_RFCOMM_CONNECT_CFM, "RFCOMM connection result"),
     {0}
 };
 
@@ -70,6 +72,23 @@ static void print_message(MessageId msg_id, Message msg)
             CAST_TYPED_MSG(CL_RFCOMM_REGISTER_CFM, tmsg);
             print_status(tmsg->status);
             PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
+            break;
+        }
+    case CL_RFCOMM_CONNECT_IND:
+        {
+            CAST_TYPED_MSG(CL_RFCOMM_CONNECT_IND, tmsg);
+            print_bdaddr(tmsg->bd_addr);
+            PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
+            PRINT(("Frame size=%d\n", tmsg->frame_size));
+            break;
+        }
+    case CL_RFCOMM_CONNECT_CFM:
+        {
+            CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
+            print_status(tmsg->status);
+            PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
+            PRINT(("Frame size=%d\n", tmsg->frame_size));
+            PRINT(("Sink=%x\n", tmsg->sink));
             break;
         }
     case CL_DM_ACL_OPENED_IND:
