@@ -77,6 +77,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         ConnectionRfcommAllocateChannel(task);
         break;
     case CL_RFCOMM_REGISTER_CFM:
+        ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
         break;
     }
 }
