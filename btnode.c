@@ -25,6 +25,7 @@
 
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
+#define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
 
 #define MSG_DESC(msg_id, desc) {msg_id, #msg_id, desc}
 static struct MsgDescription {
@@ -34,6 +35,9 @@ static struct MsgDescription {
 } MSG_DESCRIPTIONS[] = {
     MSG_DESC(CL_INIT_CFM, "ConnectLib Initialized"),
     MSG_DESC(CL_RFCOMM_REGISTER_CFM, "RFCOMM Channel Allocated"),
+    MSG_DESC(CL_DM_READ_BT_VERSION_CFM, ""),
+    MSG_DESC(CL_DM_ACL_OPENED_IND, ""),
+    MSG_DESC(CL_DM_ACL_CLOSED_IND, ""),
     {0}
 };
 
@@ -63,6 +67,21 @@ static void print_message(MessageId msg_id, Message msg)
             CAST_TYPED_MSG(CL_RFCOMM_REGISTER_CFM, tmsg);
             print_status(tmsg->status);
             PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
+            break;
+        }
+    case CL_DM_ACL_OPENED_IND:
+        {
+            CAST_TYPED_MSG(CL_DM_ACL_OPENED_IND, tmsg);
+            print_status(tmsg->status);
+            PRINT(("Incoming=%d\n", tmsg->incoming));
+            print_bdaddr(tmsg->bd_addr);
+            break;
+        }
+    case CL_DM_ACL_CLOSED_IND:
+        {
+            CAST_TYPED_MSG(CL_DM_ACL_CLOSED_IND, tmsg);
+            print_status(tmsg->status);
+            print_bdaddr(tmsg->bd_addr);
             break;
         }
     }
