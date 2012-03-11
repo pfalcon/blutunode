@@ -27,6 +27,7 @@
 #include <source.h>
 #include <sink.h>
 #include <stream.h>
+#include <vm.h>
 
 struct BtNodeCommandTask {
     TaskData task;
@@ -170,6 +171,11 @@ static void process_line(Sink sink, char *line)
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
     sink_write_str(sink, "\r\n");
+    if (!strcmp(line, "at+temp?")) {
+        char buf[20];
+        sprintf(buf, "%d\r\n", VmGetTemperature());
+        sink_write_str(sink, buf);
+    }
 }
 
 static void task_handler(Task task, MessageId msg_id, Message msg)
