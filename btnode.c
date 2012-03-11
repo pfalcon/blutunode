@@ -19,6 +19,7 @@
 #define DEBUG_PRINT_ENABLED
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <print.h>
 #include <message.h>
 #include <connection.h>
@@ -148,6 +149,12 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             CAST_TYPED_MSG(CL_SM_AUTHORISE_IND, tmsg);
             ConnectionSmAuthoriseResponse(&tmsg->bd_addr, tmsg->protocol_id, tmsg->channel, tmsg->incoming, TRUE);
+        }
+        break;
+    case CL_RFCOMM_CONNECT_IND:
+        {
+            CAST_TYPED_MSG(CL_RFCOMM_CONNECT_IND, tmsg);
+            ConnectionRfcommConnectResponse(task, TRUE, &tmsg->bd_addr, tmsg->server_channel, NULL);
         }
         break;
     }
