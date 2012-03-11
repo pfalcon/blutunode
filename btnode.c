@@ -44,6 +44,9 @@ static void print_message(MessageId msg_id, Message msg)
             PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
             break;
         }
+    default:
+        PRINT(("Unknown message: %x\n", msg_id));
+        break;
     }
 }
 
