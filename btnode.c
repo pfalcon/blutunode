@@ -38,6 +38,7 @@ static struct MsgDescription {
 /*    MSG_DESC(CL_DM_READ_BT_VERSION_CFM, ""),*/
     MSG_DESC(CL_DM_ACL_OPENED_IND, "ACL connection opened"),
     MSG_DESC(CL_DM_ACL_CLOSED_IND, "ACL connection closed"),
+    MSG_DESC(CL_SM_PIN_CODE_IND, "Pin code request from a remote"),
     {0}
 };
 
@@ -97,6 +98,12 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         break;
     case CL_RFCOMM_REGISTER_CFM:
         ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
+        break;
+    case CL_SM_PIN_CODE_IND:
+        {
+            CAST_TYPED_MSG(CL_SM_PIN_CODE_IND, tmsg);
+            ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, "1234");
+        }
         break;
     }
 }
