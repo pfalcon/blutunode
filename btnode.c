@@ -39,6 +39,7 @@ static struct MsgDescription {
     MSG_DESC(CL_DM_ACL_OPENED_IND, "ACL connection opened"),
     MSG_DESC(CL_DM_ACL_CLOSED_IND, "ACL connection closed"),
     MSG_DESC(CL_SM_PIN_CODE_IND, "Pin code request from a remote"),
+    MSG_DESC(CL_SM_AUTHENTICATE_CFM, "Authentication result of remote device"),
     {0}
 };
 
@@ -83,6 +84,15 @@ static void print_message(MessageId msg_id, Message msg)
             CAST_TYPED_MSG(CL_DM_ACL_CLOSED_IND, tmsg);
             print_status(tmsg->status);
             print_bdaddr(tmsg->bd_addr);
+            break;
+        }
+    case CL_SM_AUTHENTICATE_CFM:
+        {
+            CAST_TYPED_MSG(CL_SM_AUTHENTICATE_CFM, tmsg);
+            print_status(tmsg->status);
+            print_bdaddr(tmsg->bd_addr);
+            PRINT(("Key type=%d\n", tmsg->key_type));
+            PRINT(("Bonded=%d\n", tmsg->bonded));
             break;
         }
     }
