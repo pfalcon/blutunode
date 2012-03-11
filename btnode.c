@@ -46,12 +46,12 @@ static void print_message(MessageId msg_id, Message msg)
     struct MsgDescription *p;
     for (p = MSG_DESCRIPTIONS; p->msg_id; p++) {
         if (p->msg_id == msg_id) {
-            PRINT(("Message: %#x %s (%s)\n", p->msg_id, p->name, p->desc));
+            PRINT(("Message: 0x%x %s (%s)\n", p->msg_id, p->name, p->desc));
             break;
         }
     }
     if (!p->msg_id) {
-        PRINT(("Unknown message: %#x\n", msg_id));
+        PRINT(("Unknown message: 0x%x\n", msg_id));
         return;
     }
     
