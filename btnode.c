@@ -28,6 +28,12 @@
 #include <sink.h>
 #include <stream.h>
 
+struct BtNodeCommandTask {
+    TaskData task;
+    char input_buf[80];
+    char *buf_ptr;
+};
+
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
 #define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
@@ -178,24 +184,37 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
+            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
             Source src = tmsg->source;
-            static char buf[80];
             int size;
             while ((size = SourceSize(src)) > 0) {
                 const uint8 *p = SourceMap(src);
-                memcpy(buf, p, size);
-                buf[size] = 0;
-                SourceDrop(src, size);
-                PRINT(("Received: %s==\n", buf));
+                int i, processed_size = 0;
+                char c = 0;
+                for (i = size; i; i--) {
+                    c = *p++;
+                    printf("%x ", c);
+                    *self->buf_ptr++ = c;
+                    processed_size++;
+                    if (c == '\r') {
+                        /*break;*/
+                    }
+                }
+                SourceDrop(src, processed_size);
+                if (c == '\r') {
+                    *self->buf_ptr++ = 0;
+                    PRINT(("Received: %s==\n", self->input_buf));
+                    self->buf_ptr = self->input_buf;
+                }
             }
-            {
+            /*{
                 static char str[] = "response\r\n";
                 Sink sink = StreamSinkFromSource(src);
                 int offset = SinkClaim(sink, strlen(str));
                 uint8 *dest = SinkMap(sink);
                 memcpy(dest + offset, str, strlen(str));
                 SinkFlush(sink, strlen(str));
-            }
+            }*/
         }
         break;
     }
@@ -203,9 +222,10 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 
 int main(void)
 {
-    static TaskData app;
-    app.handler = task_handler;
-    ConnectionInit(&app);
+    static struct BtNodeCommandTask app;
+    app.task.handler = task_handler;
+    app.buf_ptr = app.input_buf;
+    ConnectionInit(&app.task);
 
     MessageLoop();
 
