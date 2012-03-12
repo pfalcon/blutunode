@@ -128,7 +128,10 @@ static void handle_input_data(BtNodeCommandTask *self, Source src)
 
 static void task_handler(Task task, MessageId msg_id, Message msg)
 {
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+
     print_message(msg_id, msg);
+
     switch (msg_id) {
     case CL_INIT_CFM:
         ConnectionRfcommAllocateChannel(task);
@@ -157,21 +160,18 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
     case CL_RFCOMM_CONNECT_CFM:
         {
             CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
-            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             self->sink = tmsg->sink;
         }
         break;
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
-            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             handle_input_data(self, tmsg->source);
         }
         break;
     case MESSAGE_ADC_RESULT:
         {
             MessageAdcResult *tmsg = (MessageAdcResult*)msg;
-            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             char buf[20];
             sprintf(buf, "ADC%d=%d (%d)\r\n", tmsg->adc_source, tmsg->reading, tmsg->scaled_reading);
             sink_write_str(self->sink, buf);
