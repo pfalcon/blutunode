@@ -19,7 +19,9 @@
 #include "btnode.h"
 
 
-static void sink_write(Sink sink, char *buf, int size)
+static int input_echo = 1;
+
+static void sink_write(Sink sink, const char *buf, int size)
 {
     int offset = SinkClaim(sink, size);
     uint8 *dest = SinkMap(sink);
@@ -27,7 +29,7 @@ static void sink_write(Sink sink, char *buf, int size)
     SinkFlush(sink, size);
 }
 
-static void sink_write_str(Sink sink, char *str)
+static void sink_write_str(Sink sink, const char *str)
 {
     sink_write(sink, str, strlen(str));
 }
@@ -128,8 +130,15 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
                 int i, processed_size = 0;
                 char c = 0;
                 for (i = size; i; i--) {
-                    c = *p++;
-                    /*printf("%x ", c);*/
+                    c = *p;
+                    if (input_echo) {
+                        if (c == '\r') {
+                            sink_write(StreamSinkFromSource(src), "\r\n", 2);
+                        } else {
+                            sink_write(StreamSinkFromSource(src), (char*)p, 1);
+                        }
+                    }
+                    p++;
                     *self->buf_ptr++ = c;
                     processed_size++;
                     if (c == '\r') {
