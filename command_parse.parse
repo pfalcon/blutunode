@@ -30,6 +30,7 @@
 { AT + GPIOSBIAS %d:pin = %d:value \r} : command_gpiosbias_pin_set
 { AT + CTS ? \r} : command_cts_get
 { AT + RTS = %d:value ? \r} : command_rts_set
+{ AT + GPIOWATCH = %d:mask, %d:count, %d:period \r} : command_gpio_watch_set
 
 { AT + ADC%d:channel ? \r} : command_adc_get
 { AT + TEMP ? \r} : command_temp_get

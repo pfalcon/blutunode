@@ -137,6 +137,14 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             sink_write_str(self->sink, buf);
         }
         break;
+    case MESSAGE_PIO_CHANGED:
+        {
+            MessagePioChanged *tmsg = (MessagePioChanged*)msg;
+            char buf[20];
+            sprintf(buf, "GPIO=%u\r\n", tmsg->state);
+            sink_write_str(self->sink, buf);
+        }
+        break;
     }
 }
 

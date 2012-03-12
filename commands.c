@@ -124,6 +124,12 @@ void command_gpiosbias_pin_set(Task task, const struct command_gpiosbias_pin_set
     write_ok(self->sink);
 }
 
+void command_gpio_watch_set(Task task, const struct command_gpio_watch_set *args)
+{
+    PioDebounce(args->mask, args->count, args->period);
+    write_ok(self->sink);
+}
+
 void command_cts_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
