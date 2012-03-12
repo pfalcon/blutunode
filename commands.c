@@ -83,6 +83,20 @@ void command_gpiodir_set(Task task, const struct command_gpiodir_set *args)
     write_ok(self->sink);
 }
 
+void command_gpiodir_pin_get(Task task, const struct command_gpiodir_pin_get *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_uint_response(self->sink, !!(PioGetDir() & (1 << args->pin)));
+}
+
+void command_gpiodir_pin_set(Task task, const struct command_gpiodir_pin_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    uint16 mask = 1 << args->pin;
+    PioSetDir(mask, args->value ? mask : 0);
+    write_ok(self->sink);
+}
+
 void command_gpiosbias_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
@@ -93,6 +107,20 @@ void command_gpiosbias_set(Task task, const struct command_gpiosbias_set *args)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     PioSetStrongBias(args->mask, args->bits);
+    write_ok(self->sink);
+}
+
+void command_gpiosbias_pin_get(Task task, const struct command_gpiosbias_pin_get *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_uint_response(self->sink, !!(PioGetStrongBias() & (1 << args->pin)));
+}
+
+void command_gpiosbias_pin_set(Task task, const struct command_gpiosbias_pin_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    uint16 mask = 1 << args->pin;
+    PioSetStrongBias(mask, args->value ? mask : 0);
     write_ok(self->sink);
 }
 
