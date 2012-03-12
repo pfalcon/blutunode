@@ -28,6 +28,7 @@
 #include <sink.h>
 #include <stream.h>
 #include <vm.h>
+#include <pio.h>
 
 struct BtNodeCommandTask {
     TaskData task;
@@ -166,15 +167,28 @@ static void sink_write_str(Sink sink, char *str)
     sink_write(sink, str, strlen(str));
 }
 
+static void write_int_response(Sink sink, int value)
+{
+    char buf[20];
+    sprintf(buf, "%d\r\n", value);
+    sink_write_str(sink, buf);
+}
+
 static void process_line(Sink sink, char *line)
 {
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
     sink_write_str(sink, "\r\n");
     if (!strcmp(line, "at+temp?")) {
-        char buf[20];
-        sprintf(buf, "%d\r\n", VmGetTemperature());
-        sink_write_str(sink, buf);
+        write_int_response(sink, VmGetTemperature());
+    } else if (!strcmp(line, "at+gpio?")) {
+        write_int_response(sink, PioGet());
+    } else if (!strcmp(line, "at+gpiodir?")) {
+        write_int_response(sink, PioGetDir());
+    } else if (!strcmp(line, "at+gpiosbias?")) {
+        write_int_response(sink, PioGetStrongBias());
+    } else if (!strcmp(line, "at+cts?")) {
+        write_int_response(sink, PioGetCts());
     }
 }
 
