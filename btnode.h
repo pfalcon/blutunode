@@ -41,3 +41,5 @@ struct BtNodeCommandTask {
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
 #define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
+
+void print_message(MessageId msg_id, Message msg);
