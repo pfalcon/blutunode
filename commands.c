@@ -56,10 +56,24 @@ void command_gpiodir_get(Task task)
     write_int_response(self->sink, PioGetDir());
 }
 
+void command_gpiodir_set(Task task, const struct command_gpiodir_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    PioSetDir(args->mask, args->bits);
+    write_ok(self->sink);
+}
+
 void command_gpiosbias_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     write_int_response(self->sink, PioGetStrongBias());
+}
+
+void command_gpiosbias_set(Task task, const struct command_gpiosbias_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    PioSetStrongBias(args->mask, args->bits);
+    write_ok(self->sink);
 }
 
 void command_cts_get(Task task)
