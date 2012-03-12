@@ -16,6 +16,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ctype.h>
 #include "btnode.h"
 #include "command_parse.h"
 
@@ -60,7 +61,12 @@ void command_gpio_pin_set(Task task, const struct command_gpio_pin_set *args)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     uint16 mask = 1 << args->pin;
-    PioSet(mask, args->value ? mask : 0);
+    char value = *args->value.data;
+    if (tolower(value) == 't') {
+        PioSet(mask, PioGet() ^ mask);
+    } else {
+        PioSet(mask, value == '0' ? 0 : mask);
+    }
     write_ok(self->sink);
 }
 
