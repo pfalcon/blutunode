@@ -41,34 +41,6 @@ static void process_line(BtNodeCommandTask *task, Sink sink, char *line)
     sink_write_str(sink, "\r\n");
 
     parseData((uint8*)line, (uint8*)line + strlen(line), (Task)task);
-    return;
- 
-    if (!strcmp(line, "at+temp?")) {
-        write_int_response(sink, VmGetTemperature());
-    } else if (!strcmp(line, "at+gpio?")) {
-        write_int_response(sink, PioGet());
-    } else if (!strncmp(line, "at+gpio=", 8)) {
-        int bits, mask = atoi(line + 8);
-        char *p = strchr(line + 8, ',');
-        if (!p) {
-            write_error(sink);
-            return;
-        }
-        bits = atoi(p + 1);
-        PioSet(mask, bits);
-        write_ok(sink);
-    } else if (!strcmp(line, "at+gpiodir?")) {
-        write_int_response(sink, PioGetDir());
-    } else if (!strcmp(line, "at+gpiosbias?")) {
-        write_int_response(sink, PioGetStrongBias());
-    } else if (!strcmp(line, "at+cts?")) {
-        write_int_response(sink, PioGetCts());
-    } else if (!strncmp(line, "at+adc", 6)) {
-        int channel = line[6] & 0xf;
-        if (!AdcRequest((Task)task, channel)) {
-            write_error(sink);
-        }
-    }
 }
 
 static void handle_input_data(BtNodeCommandTask *self, Source src)

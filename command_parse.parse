@@ -18,3 +18,8 @@
 
 { AT + GPIO ? \r} : command_gpio_get
 { AT + GPIO = %d:mask, %d:bits \r} : command_gpio_set
+{ AT + GPIODIR ? \r} : command_gpiodir_get
+{ AT + GPIOSBIAS ? \r} : command_gpiosbias_get
+{ AT + CTS ? \r} : command_cts_get
+{ AT + ADC%d:channel \r} : command_adc_get
+{ AT + TEMP ? \r} : command_temp_get

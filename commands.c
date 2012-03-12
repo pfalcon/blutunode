@@ -50,6 +50,38 @@ void command_gpio_set(Task task, const struct command_gpio_set *args)
     write_ok(self->sink);
 }
 
+void command_gpiodir_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_int_response(self->sink, PioGetDir());
+}
+
+void command_gpiosbias_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_int_response(self->sink, PioGetStrongBias());
+}
+
+void command_cts_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_int_response(self->sink, PioGetCts());
+}
+
+void command_adc_get(Task task, const struct command_adc_get *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    if (!AdcRequest(task, args->channel)) {
+        write_error(self->sink);
+    }
+}
+
+void command_temp_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_int_response(self->sink, VmGetTemperature());
+}
+
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
