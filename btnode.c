@@ -29,9 +29,11 @@
 #include <stream.h>
 #include <vm.h>
 #include <pio.h>
+#include <adc.h>
 
 struct BtNodeCommandTask {
     TaskData task;
+    Sink sink;
     char input_buf[80];
     char *buf_ptr;
 };
@@ -58,6 +60,7 @@ static struct MsgDescription {
     MSG_DESC(CL_RFCOMM_CONNECT_CFM, "RFCOMM connection result"),
     MSG_DESC(MESSAGE_MORE_DATA, "More data available in source"),
     MSG_DESC(MESSAGE_MORE_SPACE, "More space available in sink"),
+    MSG_DESC(MESSAGE_ADC_RESULT, "ADC reading available"),
     {0}
 };
 
@@ -174,7 +177,7 @@ static void write_int_response(Sink sink, int value)
     sink_write_str(sink, buf);
 }
 
-static void process_line(Sink sink, char *line)
+static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
 {
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
@@ -189,6 +192,11 @@ static void process_line(Sink sink, char *line)
         write_int_response(sink, PioGetStrongBias());
     } else if (!strcmp(line, "at+cts?")) {
         write_int_response(sink, PioGetCts());
+    } else if (!strncmp(line, "at+adc", 6)) {
+        int channel = line[6] & 0xf;
+        if (!AdcRequest((Task)task, channel)) {
+            sink_write_str(sink, "ERROR\r\n");
+        }
     }
 }
 
@@ -220,6 +228,13 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             ConnectionRfcommConnectResponse(task, TRUE, &tmsg->bd_addr, tmsg->server_channel, NULL);
         }
         break;
+    case CL_RFCOMM_CONNECT_CFM:
+        {
+            CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
+            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
+            self->sink = tmsg->sink;
+        }
+        break;
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
@@ -243,10 +258,19 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
                 if (c == '\r') {
                     self->buf_ptr[-1] = 0;
                     PRINT(("Received: %s==\n", self->input_buf));
-                    process_line(StreamSinkFromSource(src), self->input_buf);
+                    process_line(self, StreamSinkFromSource(src), self->input_buf);
                     self->buf_ptr = self->input_buf;
                 }
             }
+        }
+        break;
+    case MESSAGE_ADC_RESULT:
+        {
+            MessageAdcResult *tmsg = (MessageAdcResult*)msg;
+            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
+            char buf[20];
+            sprintf(buf, "ADC%d=%d (%d)\r\n", tmsg->adc_source, tmsg->reading, tmsg->scaled_reading);
+            sink_write_str(self->sink, buf);
         }
         break;
     }
