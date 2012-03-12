@@ -21,10 +21,10 @@
 #include "command_parse.h"
 
 
-static void write_int_response(Sink sink, int value)
+static void write_uint_response(Sink sink, uint16 value)
 {
     char buf[20];
-    sprintf(buf, "%d\r\n", value);
+    sprintf(buf, "%u\r\n", value);
     sink_write_str(sink, buf);
 }
 
@@ -41,7 +41,7 @@ static void write_error(Sink sink)
 void command_gpio_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, PioGet());
+    write_uint_response(self->sink, PioGet());
 }
 
 void command_gpio_set(Task task, const struct command_gpio_set *args)
@@ -54,7 +54,7 @@ void command_gpio_set(Task task, const struct command_gpio_set *args)
 void command_gpio_pin_get(Task task, const struct command_gpio_pin_get *args)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, !!(PioGet() & (1 << args->pin)));
+    write_uint_response(self->sink, !!(PioGet() & (1 << args->pin)));
 }
 
 void command_gpio_pin_set(Task task, const struct command_gpio_pin_set *args)
@@ -73,7 +73,7 @@ void command_gpio_pin_set(Task task, const struct command_gpio_pin_set *args)
 void command_gpiodir_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, PioGetDir());
+    write_uint_response(self->sink, PioGetDir());
 }
 
 void command_gpiodir_set(Task task, const struct command_gpiodir_set *args)
@@ -86,7 +86,7 @@ void command_gpiodir_set(Task task, const struct command_gpiodir_set *args)
 void command_gpiosbias_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, PioGetStrongBias());
+    write_uint_response(self->sink, PioGetStrongBias());
 }
 
 void command_gpiosbias_set(Task task, const struct command_gpiosbias_set *args)
@@ -99,7 +99,7 @@ void command_gpiosbias_set(Task task, const struct command_gpiosbias_set *args)
 void command_cts_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, PioGetCts());
+    write_uint_response(self->sink, PioGetCts());
 }
 
 void command_adc_get(Task task, const struct command_adc_get *args)
@@ -113,7 +113,7 @@ void command_adc_get(Task task, const struct command_adc_get *args)
 void command_temp_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
-    write_int_response(self->sink, VmGetTemperature());
+    write_uint_response(self->sink, VmGetTemperature());
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
