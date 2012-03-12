@@ -16,31 +16,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define DEBUG_PRINT_ENABLED
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <print.h>
-#include <message.h>
-#include <connection.h>
-#include <source.h>
-#include <sink.h>
-#include <stream.h>
-#include <vm.h>
-#include <pio.h>
-#include <adc.h>
-
-struct BtNodeCommandTask {
-    TaskData task;
-    Sink sink;
-    char input_buf[80];
-    char *buf_ptr;
-};
-
-#define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
-#define print_status(status) printf("Status: %d\n", status)
-#define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
+#include "btnode.h"
 
 #define MSG_DESC(msg_id, desc) {msg_id, #msg_id, desc}
 static struct MsgDescription {
