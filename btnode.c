@@ -95,7 +95,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
     case CL_SM_PIN_CODE_IND:
         {
             CAST_TYPED_MSG(CL_SM_PIN_CODE_IND, tmsg);
-            ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, "1234");
+            ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, (uint8*)"1234");
         }
         break;
     case CL_SM_AUTHORISE_IND:
