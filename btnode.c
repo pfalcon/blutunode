@@ -177,6 +177,16 @@ static void write_int_response(Sink sink, int value)
     sink_write_str(sink, buf);
 }
 
+static void write_ok(Sink sink)
+{
+    sink_write_str(sink, "OK\r\n");
+}
+
+static void write_error(Sink sink)
+{
+    sink_write_str(sink, "ERROR\r\n");
+}
+
 static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
 {
     sink_write_str(sink, "Received: ");
@@ -186,6 +196,16 @@ static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
         write_int_response(sink, VmGetTemperature());
     } else if (!strcmp(line, "at+gpio?")) {
         write_int_response(sink, PioGet());
+    } else if (!strncmp(line, "at+gpio=", 8)) {
+        int bits, mask = atoi(line + 8);
+        char *p = strchr(line + 8, ',');
+        if (!p) {
+            write_error(sink);
+            return;
+        }
+        bits = atoi(p + 1);
+        PioSet(mask, bits);
+        write_ok(sink);
     } else if (!strcmp(line, "at+gpiodir?")) {
         write_int_response(sink, PioGetDir());
     } else if (!strcmp(line, "at+gpiosbias?")) {
@@ -195,7 +215,7 @@ static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
     } else if (!strncmp(line, "at+adc", 6)) {
         int channel = line[6] & 0xf;
         if (!AdcRequest((Task)task, channel)) {
-            sink_write_str(sink, "ERROR\r\n");
+            write_error(sink);
         }
     }
 }
