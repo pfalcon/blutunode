@@ -82,7 +82,7 @@ void print_message(MessageId msg_id, Message msg)
             print_status(tmsg->status);
             PRINT(("RFCOMM channel=%d\n", tmsg->server_channel));
             PRINT(("Frame size=%d\n", tmsg->frame_size));
-            PRINT(("Sink=%x\n", tmsg->sink));
+            PRINT(("Sink=%x\n", (int)tmsg->sink));
             break;
         }
     case CL_DM_ACL_OPENED_IND:
@@ -121,13 +121,13 @@ void print_message(MessageId msg_id, Message msg)
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
-            PRINT(("Source=%x\n", tmsg->source));
+            PRINT(("Source=%x\n", (int)tmsg->source));
             break;
         }
     case MESSAGE_MORE_SPACE:
         {
             MessageMoreSpace *tmsg = (MessageMoreSpace*)msg;
-            PRINT(("Sink=%x\n", tmsg->sink));
+            PRINT(("Sink=%x\n", (int)tmsg->sink));
             break;
         }
     }
