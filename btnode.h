@@ -43,3 +43,6 @@ typedef struct BtNodeCommandTask {
 #define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
 
 void print_message(MessageId msg_id, Message msg);
+
+void sink_write(Sink sink, const char *buf, int size);
+void sink_write_str(Sink sink, const char *str);

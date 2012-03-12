@@ -21,7 +21,7 @@
 
 static int input_echo = 1;
 
-static void sink_write(Sink sink, const char *buf, int size)
+void sink_write(Sink sink, const char *buf, int size)
 {
     int offset = SinkClaim(sink, size);
     uint8 *dest = SinkMap(sink);
@@ -29,26 +29,9 @@ static void sink_write(Sink sink, const char *buf, int size)
     SinkFlush(sink, size);
 }
 
-static void sink_write_str(Sink sink, const char *str)
+void sink_write_str(Sink sink, const char *str)
 {
     sink_write(sink, str, strlen(str));
-}
-
-static void write_int_response(Sink sink, int value)
-{
-    char buf[20];
-    sprintf(buf, "%d\r\n", value);
-    sink_write_str(sink, buf);
-}
-
-static void write_ok(Sink sink)
-{
-    sink_write_str(sink, "OK\r\n");
-}
-
-static void write_error(Sink sink)
-{
-    sink_write_str(sink, "ERROR\r\n");
 }
 
 static void process_line(BtNodeCommandTask *task, Sink sink, char *line)
@@ -56,6 +39,10 @@ static void process_line(BtNodeCommandTask *task, Sink sink, char *line)
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
     sink_write_str(sink, "\r\n");
+
+    parseData((uint8*)line, (uint8*)line + strlen(line), (Task)task);
+    return;
+ 
     if (!strcmp(line, "at+temp?")) {
         write_int_response(sink, VmGetTemperature());
     } else if (!strcmp(line, "at+gpio?")) {
@@ -109,17 +96,17 @@ static void handle_input_data(BtNodeCommandTask *self, Source src)
                     sink_write(StreamSinkFromSource(src), (char*)p - 1, 1);
                 }
             }
+            *self->buf_ptr++ = c;
             if (c == '\r') {
                 break;
             }
-            *self->buf_ptr++ = c;
         }
 
         SourceDrop(src, processed_size);
 
         if (c == '\r') {
             *self->buf_ptr = 0;
-            PRINT(("Received: %s==\n", self->input_buf));
+            PRINT(("Received: %s\n", self->input_buf));
             process_line(self, StreamSinkFromSource(src), self->input_buf);
             self->buf_ptr = self->input_buf;
         }
@@ -167,6 +154,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
             handle_input_data(self, tmsg->source);
+            /*parseSource(tmsg->source, task);*/
         }
         break;
     case MESSAGE_ADC_RESULT:
