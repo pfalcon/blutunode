@@ -29,6 +29,7 @@
 { AT + GPIOSBIAS = %d:mask, %d:bits \r} : command_gpiosbias_set
 { AT + GPIOSBIAS %d:pin = %d:value \r} : command_gpiosbias_pin_set
 { AT + CTS ? \r} : command_cts_get
+{ AT + RTS = %d:value ? \r} : command_rts_set
 
 { AT + ADC%d:channel ? \r} : command_adc_get
 { AT + TEMP ? \r} : command_temp_get

@@ -130,6 +130,16 @@ void command_cts_get(Task task)
     write_uint_response(self->sink, PioGetCts());
 }
 
+void command_rts_set(Task task, const struct command_rts_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    if (PioSetRts(!!args->value)) {
+        write_ok(self->sink);
+    } else {
+        write_error(self->sink);
+    }
+}
+
 void command_adc_get(Task task, const struct command_adc_get *args)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
