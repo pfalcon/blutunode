@@ -84,6 +84,48 @@ static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
     }
 }
 
+static void handle_input_data(struct BtNodeCommandTask *self, Source src)
+{
+    int size;
+    while ((size = SourceSize(src)) > 0) {
+        const uint8 *p = SourceMap(src);
+        int i, processed_size = 0;
+        char c = 0;
+        for (i = size; i; i--) {
+            c = *p++;
+            processed_size++;
+            if (c == 0x08 || c == 0x7f) {
+                if (self->buf_ptr > self->input_buf) {
+                    self->buf_ptr--;
+                    /* Need to overwrite with a space for Linux terminal */
+                    sink_write(StreamSinkFromSource(src), "\x08 \x08", 3);
+                }
+                continue;
+            }
+            if (input_echo) {
+                if (c == '\r') {
+                    sink_write(StreamSinkFromSource(src), "\r\n", 2);
+                } else {
+                    sink_write(StreamSinkFromSource(src), (char*)p - 1, 1);
+                }
+            }
+            if (c == '\r') {
+                break;
+            }
+            *self->buf_ptr++ = c;
+        }
+
+        SourceDrop(src, processed_size);
+
+        if (c == '\r') {
+            *self->buf_ptr = 0;
+            PRINT(("Received: %s==\n", self->input_buf));
+            process_line(self, StreamSinkFromSource(src), self->input_buf);
+            self->buf_ptr = self->input_buf;
+        }
+    }
+}
+
 static void task_handler(Task task, MessageId msg_id, Message msg)
 {
     print_message(msg_id, msg);
@@ -123,45 +165,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
             struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
-            Source src = tmsg->source;
-            int size;
-            while ((size = SourceSize(src)) > 0) {
-                const uint8 *p = SourceMap(src);
-                int i, processed_size = 0;
-                char c = 0;
-                for (i = size; i; i--) {
-                    c = *p++;
-                    processed_size++;
-                    if (c == 0x08 || c == 0x7f) {
-                        if (self->buf_ptr > self->input_buf) {
-                            self->buf_ptr--;
-                            /* Need to overwrite with a space for Linux terminal */
-                            sink_write(StreamSinkFromSource(src), "\x08 \x08", 3);
-                        }
-                        continue;
-                    }
-                    if (input_echo) {
-                        if (c == '\r') {
-                            sink_write(StreamSinkFromSource(src), "\r\n", 2);
-                        } else {
-                            sink_write(StreamSinkFromSource(src), (char*)p - 1, 1);
-                        }
-                    }
-                    if (c == '\r') {
-                        break;
-                    }
-                    *self->buf_ptr++ = c;
-                }
-
-                SourceDrop(src, processed_size);
-
-                if (c == '\r') {
-                    *self->buf_ptr = 0;
-                    PRINT(("Received: %s==\n", self->input_buf));
-                    process_line(self, StreamSinkFromSource(src), self->input_buf);
-                    self->buf_ptr = self->input_buf;
-                }
-            }
+            handle_input_data(self, tmsg->source);
         }
         break;
     case MESSAGE_ADC_RESULT:
