@@ -145,6 +145,7 @@ int main(void)
     static BtNodeCommandTask app;
     app.task.handler = task_handler;
     app.buf_ptr = app.input_buf;
+    MessagePioTask(&app.task);
     ConnectionInit(&app.task);
 
     MessageLoop();

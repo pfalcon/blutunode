@@ -37,6 +37,7 @@ static struct MsgDescription {
     MSG_DESC(MESSAGE_MORE_DATA, "More data available in source"),
     MSG_DESC(MESSAGE_MORE_SPACE, "More space available in sink"),
     MSG_DESC(MESSAGE_ADC_RESULT, "ADC reading available"),
+    MSG_DESC(MESSAGE_PIO_CHANGED, "PIO pin(s) changed"),
     {0}
 };
 
@@ -128,6 +129,12 @@ void print_message(MessageId msg_id, Message msg)
         {
             MessageMoreSpace *tmsg = (MessageMoreSpace*)msg;
             PRINT(("Sink=%x\n", (int)tmsg->sink));
+            break;
+        }
+    case MESSAGE_PIO_CHANGED:
+        {
+            MessagePioChanged *tmsg = (MessagePioChanged*)msg;
+            PRINT(("GPIO state=%x\n", (int)tmsg->state));
             break;
         }
     }
