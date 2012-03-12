@@ -130,17 +130,24 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
                 int i, processed_size = 0;
                 char c = 0;
                 for (i = size; i; i--) {
-                    c = *p;
+                    c = *p++;
+                    processed_size++;
+                    if (c == 0x08 || c == 0x7f) {
+                        if (self->buf_ptr > self->input_buf) {
+                            self->buf_ptr--;
+                            /* Need to overwrite with a space for Linux terminal */
+                            sink_write(StreamSinkFromSource(src), "\x08 \x08", 3);
+                        }
+                        continue;
+                    }
                     if (input_echo) {
                         if (c == '\r') {
                             sink_write(StreamSinkFromSource(src), "\r\n", 2);
                         } else {
-                            sink_write(StreamSinkFromSource(src), (char*)p, 1);
+                            sink_write(StreamSinkFromSource(src), (char*)p - 1, 1);
                         }
                     }
-                    p++;
                     *self->buf_ptr++ = c;
-                    processed_size++;
                     if (c == '\r') {
                         break;
                     }
