@@ -50,6 +50,20 @@ void command_gpio_set(Task task, const struct command_gpio_set *args)
     write_ok(self->sink);
 }
 
+void command_gpio_pin_get(Task task, const struct command_gpio_pin_get *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_int_response(self->sink, !!(PioGet() & (1 << args->pin)));
+}
+
+void command_gpio_pin_set(Task task, const struct command_gpio_pin_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    uint16 mask = 1 << args->pin;
+    PioSet(mask, args->value ? mask : 0);
+    write_ok(self->sink);
+}
+
 void command_gpiodir_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
