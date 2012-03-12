@@ -51,7 +51,7 @@ static void write_error(Sink sink)
     sink_write_str(sink, "ERROR\r\n");
 }
 
-static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
+static void process_line(BtNodeCommandTask *task, Sink sink, char *line)
 {
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
@@ -84,7 +84,7 @@ static void process_line(struct BtNodeCommandTask *task, Sink sink, char *line)
     }
 }
 
-static void handle_input_data(struct BtNodeCommandTask *self, Source src)
+static void handle_input_data(BtNodeCommandTask *self, Source src)
 {
     int size;
     while ((size = SourceSize(src)) > 0) {
@@ -157,21 +157,21 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
     case CL_RFCOMM_CONNECT_CFM:
         {
             CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
-            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
+            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             self->sink = tmsg->sink;
         }
         break;
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
-            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
+            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             handle_input_data(self, tmsg->source);
         }
         break;
     case MESSAGE_ADC_RESULT:
         {
             MessageAdcResult *tmsg = (MessageAdcResult*)msg;
-            struct BtNodeCommandTask *self = (struct BtNodeCommandTask*)task;
+            BtNodeCommandTask *self = (BtNodeCommandTask*)task;
             char buf[20];
             sprintf(buf, "ADC%d=%d (%d)\r\n", tmsg->adc_source, tmsg->reading, tmsg->scaled_reading);
             sink_write_str(self->sink, buf);
@@ -182,7 +182,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 
 int main(void)
 {
-    static struct BtNodeCommandTask app;
+    static BtNodeCommandTask app;
     app.task.handler = task_handler;
     app.buf_ptr = app.input_buf;
     ConnectionInit(&app.task);

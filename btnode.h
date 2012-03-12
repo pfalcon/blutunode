@@ -31,12 +31,12 @@
 #include <pio.h>
 #include <adc.h>
 
-struct BtNodeCommandTask {
+typedef struct BtNodeCommandTask {
     TaskData task;
     Sink sink;
     char input_buf[80];
     char *buf_ptr;
-};
+} BtNodeCommandTask;
 
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
