@@ -147,14 +147,16 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
                             sink_write(StreamSinkFromSource(src), (char*)p - 1, 1);
                         }
                     }
-                    *self->buf_ptr++ = c;
                     if (c == '\r') {
                         break;
                     }
+                    *self->buf_ptr++ = c;
                 }
+
                 SourceDrop(src, processed_size);
+
                 if (c == '\r') {
-                    self->buf_ptr[-1] = 0;
+                    *self->buf_ptr = 0;
                     PRINT(("Received: %s==\n", self->input_buf));
                     process_line(self, StreamSinkFromSource(src), self->input_buf);
                     self->buf_ptr = self->input_buf;
