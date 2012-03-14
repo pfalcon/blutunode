@@ -257,6 +257,7 @@ void command_poll_handle(BtNodeCommandTask *self)
 
 void command_pskey_get(Task task, const struct command_pskey_get *args)
 {
+    /* TODO: Should be controlled by security */
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     uint16 value_buf[128];
     char buf[10];
