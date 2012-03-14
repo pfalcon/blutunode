@@ -60,6 +60,7 @@ void print_message(MessageId msg_id, Message msg)
         {
             CAST_TYPED_MSG(CL_INIT_CFM, tmsg);
             print_status(tmsg->status);
+            PRINT(("BT version code=%d\n", tmsg->version));
             break;
         }
     case CL_RFCOMM_REGISTER_CFM:
