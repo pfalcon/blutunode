@@ -300,6 +300,12 @@ void command_sleep_set(Task task, const struct command_sleep_set *args)
     write_ok_uint(self->sink, VmDeepSleepEnable(args->state));
 }
 
+void command_alloc_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_uint_response(self->sink, VmGetAvailableAllocations());
+}
+
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
