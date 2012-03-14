@@ -41,3 +41,4 @@
 { AT + POLL = %d:period, %s:input \r} : command_poll_set
 
 { AT + PSKEY %d:pskey ? \r} : command_pskey_get
+{ AT + CLK ? \r} : command_clk_get

@@ -52,6 +52,13 @@ static void write_uint_response(Sink sink, uint16 value)
     sink_write_str(sink, buf);
 }
 
+static void write_uint32_response(Sink sink, uint32 value)
+{
+    char buf[20];
+    sprintf(buf, "%lu\r\n", value);
+    sink_write_str(sink, buf);
+}
+
 static void write_ok(Sink sink)
 {
     sink_write_str(sink, "OK\r\n");
@@ -273,6 +280,12 @@ void command_pskey_get(Task task, const struct command_pskey_get *args)
     }
     sprintf(buf, "\r\nOK %d\r\n", size);
     sink_write_str(self->sink, buf);
+}
+
+void command_clk_get(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_uint32_response(self->sink, VmGetClock());
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
