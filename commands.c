@@ -64,6 +64,13 @@ static void write_ok(Sink sink)
     sink_write_str(sink, "OK\r\n");
 }
 
+static void write_ok_uint(Sink sink, uint32 value)
+{
+    char buf[20];
+    sprintf(buf, "OK %lu\r\n", value);
+    sink_write_str(sink, buf);
+}
+
 static void write_error(Sink sink)
 {
     sink_write_str(sink, "ERROR\r\n");
@@ -267,7 +274,6 @@ void command_pskey_get(Task task, const struct command_pskey_get *args)
     /* TODO: Should be controlled by security */
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     uint16 value_buf[128];
-    char buf[10];
     int size = PsFullRetrieve(args->pskey, value_buf, sizeof(value_buf));
     int i;
     if (!size) {
@@ -275,17 +281,23 @@ void command_pskey_get(Task task, const struct command_pskey_get *args)
         return;
     }
     for (i = 0; i < size; i++) {
+        char buf[10];
         sprintf(buf, "%X ", value_buf[i]);
         sink_write(self->sink, buf, 3);
     }
-    sprintf(buf, "\r\nOK %d\r\n", size);
-    sink_write_str(self->sink, buf);
+    write_ok_uint(self->sink, size);
 }
 
 void command_clk_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     write_uint32_response(self->sink, VmGetClock());
+}
+
+void command_sleep_set(Task task, const struct command_sleep_set *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_ok_uint(self->sink, VmDeepSleepEnable(args->state));
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)

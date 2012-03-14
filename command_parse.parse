@@ -42,3 +42,4 @@
 
 { AT + PSKEY %d:pskey ? \r} : command_pskey_get
 { AT + CLK ? \r} : command_clk_get
+{ AT + SLEEP = %d:state \r} : command_sleep_set
