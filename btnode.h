@@ -48,6 +48,7 @@ typedef struct BtNodeCommandTask {
 /* Periodical poll message */
 #define APP_MESSAGE_POLL 10
 
+#define COUNT(arr) (sizeof(arr)/sizeof(*arr))
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
 #define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
@@ -57,4 +58,7 @@ void print_message(MessageId msg_id, Message msg);
 void sink_write(Sink sink, const char *buf, int size);
 void sink_write_str(Sink sink, const char *str);
 
+/* Handlers for commands with async result */
 void command_poll_handle(BtNodeCommandTask *self);
+void command_bt_version_handle(BtNodeCommandTask *self, CL_DM_READ_BT_VERSION_CFM_T *tmsg);
+void command_local_version_handle(BtNodeCommandTask *self, CL_DM_LOCAL_VERSION_CFM_T *tmsg);

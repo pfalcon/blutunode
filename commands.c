@@ -76,6 +76,17 @@ static void write_error(Sink sink)
     sink_write_str(sink, "ERROR\r\n");
 }
 
+static const char *render_enum(int value, const char *names[], int size)
+{
+    /* Not reenterable! Don't use more than one in one printf */
+    static char buf[10];
+    if (value < size) {
+        return names[value];
+    }
+    sprintf(buf, "? (%d)", value);
+    return buf;
+}
+
 /* 1 if result immediately available,
    0 if delayed and handled asynchronously,
   -1 if error */
@@ -304,6 +315,39 @@ void command_alloc_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
     write_uint_response(self->sink, VmGetAvailableAllocations());
+}
+
+void command_bt_version_get(Task task)
+{
+    ConnectionReadBtVersion(task);
+}
+
+void command_bt_version_handle(BtNodeCommandTask *self, CL_DM_READ_BT_VERSION_CFM_T *tmsg)
+{
+    static const char *bt_vers[] = {"UNK", "2.0", "2.1"};
+    sink_write_str(self->sink, render_enum(tmsg->version, bt_vers, COUNT(bt_vers)));
+    sink_write(self->sink, "\r\n", 2);
+}
+
+void command_local_version_get(Task task)
+{
+    ConnectionReadLocalVersion(task);
+}
+
+void command_local_version_handle(BtNodeCommandTask *self, CL_DM_LOCAL_VERSION_CFM_T *tmsg)
+{
+    static const char *hci_vers[] = {"1.0 (0)", "1.1 (1)", "1.2 (2)", "2.0 (3)", "2.1 (4)"};
+    char buf[30];
+    sprintf(buf, "HCI ver: %s\r\n", render_enum(tmsg->hciVersion, hci_vers, COUNT(hci_vers)));
+    sink_write_str(self->sink, buf);
+    sprintf(buf, "HCI rev: %d\r\n", tmsg->hciRevision);
+    sink_write_str(self->sink, buf);
+    sprintf(buf, "LMP ver: %d\r\n", tmsg->lmpVersion);
+    sink_write_str(self->sink, buf);
+    sprintf(buf, "LMP subver: %d\r\n", tmsg->lmpSubVersion);
+    sink_write_str(self->sink, buf);
+    sprintf(buf, "Manf id: %d\r\n", tmsg->manufacturerName);
+    sink_write_str(self->sink, buf);
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)

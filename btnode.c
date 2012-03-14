@@ -156,6 +156,18 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             command_poll_handle(self);
         }
         break;
+    case CL_DM_READ_BT_VERSION_CFM:
+        {
+            CAST_TYPED_MSG(CL_DM_READ_BT_VERSION_CFM, tmsg);
+            command_bt_version_handle(self, tmsg);
+        }
+        break;
+    case CL_DM_LOCAL_VERSION_CFM:
+        {
+            CAST_TYPED_MSG(CL_DM_LOCAL_VERSION_CFM, tmsg);
+            command_local_version_handle(self, tmsg);
+        }
+        break;
     }
 }
 
