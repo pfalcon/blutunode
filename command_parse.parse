@@ -39,3 +39,5 @@
 
 { AT + POLL = \r} : command_poll_reset
 { AT + POLL = %d:period, %s:input \r} : command_poll_set
+
+{ AT + PSKEY %d:pskey ? \r} : command_pskey_get

@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include "btnode.h"
 #include "command_parse.h"
+#include <ps.h>
 
 enum { 
     ADC0 = VM_ADC_SRC_AIO0,
@@ -252,6 +253,25 @@ void command_poll_handle(BtNodeCommandTask *self)
         sink_write_str(self->sink, buf);
     }
     MessageSendLater((Task)self, APP_MESSAGE_POLL, NULL, self->poll_period);
+}
+
+void command_pskey_get(Task task, const struct command_pskey_get *args)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    uint16 value_buf[128];
+    char buf[10];
+    int size = PsFullRetrieve(args->pskey, value_buf, sizeof(value_buf));
+    int i;
+    if (!size) {
+        sink_write_str(self->sink, "ERROR: no pskey or value too long\r\n");
+        return;
+    }
+    for (i = 0; i < size; i++) {
+        sprintf(buf, "%X ", value_buf[i]);
+        sink_write(self->sink, buf, 3);
+    }
+    sprintf(buf, "\r\nOK %d\r\n", size);
+    sink_write_str(self->sink, buf);
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
