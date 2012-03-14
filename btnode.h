@@ -31,12 +31,22 @@
 #include <pio.h>
 #include <adc.h>
 
+struct InputSource {
+    char *name;
+    int id;
+};
+
 typedef struct BtNodeCommandTask {
     TaskData task;
     Sink sink;
     char input_buf[80];
     char *buf_ptr;
+    struct InputSource *poll_source;
+    int poll_period;
 } BtNodeCommandTask;
+
+/* Periodical poll message */
+#define APP_MESSAGE_POLL 10
 
 #define CAST_TYPED_MSG(msg_id, typed_msg) msg_id##_T *typed_msg = (msg_id##_T*)msg
 #define print_status(status) printf("Status: %d\n", status)
@@ -46,3 +56,5 @@ void print_message(MessageId msg_id, Message msg);
 
 void sink_write(Sink sink, const char *buf, int size);
 void sink_write_str(Sink sink, const char *str);
+
+void command_poll_handle(BtNodeCommandTask *self);

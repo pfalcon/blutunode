@@ -145,6 +145,11 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             sink_write_str(self->sink, buf);
         }
         break;
+    case APP_MESSAGE_POLL:
+        {
+            command_poll_handle(self);
+        }
+        break;
     }
 }
 

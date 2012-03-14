@@ -34,3 +34,6 @@
 
 { AT + ADC%d:channel ? \r} : command_adc_get
 { AT + TEMP ? \r} : command_temp_get
+
+{ AT + POLL = \r} : command_poll_reset
+{ AT + POLL = %d:period, %s:input \r} : command_poll_set
