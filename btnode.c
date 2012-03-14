@@ -18,6 +18,11 @@
 
 #include "btnode.h"
 
+char HEADER[] = "BtNode 0.5 Copyright (c)2012 by Paul Sokolovky\r\n"
+                "This program is free software; you can redistribute and/or modify it "
+                "under the terms of the GNU General Public License as published by "
+                "Free Software Foundation; either version 3 or any later version. "
+                "This program comes with NO WARRANTY.\r\n";
 
 static int input_echo = 1;
 
@@ -120,6 +125,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
             self->sink = tmsg->sink;
+            sink_write_str(self->sink, HEADER);
         }
         break;
     case MESSAGE_MORE_DATA:
