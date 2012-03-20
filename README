@@ -1,0 +1,11 @@
+Wireless sensor/actuator node software for Bluetooth modules
+============================================================
+
+This is experimental firmware for CSR BlueCore based Bluetooth modules
+allowing a host to control most of the I/O aspectes of a module, thus
+allowing for low-cost, flexible, easily accessible solutions for various
+remote control and automation tasks.
+
+
+This source code is released under the terms if GNU General Public License
+version 3, http://www.gnu.org/copyleft/gpl.html
