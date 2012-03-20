@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include "btnode.h"
 #include "command_parse.h"
+#include "utils.h"
 #include <ps.h>
 
 enum { 
@@ -74,17 +75,6 @@ static void write_ok_uint(Sink sink, uint32 value)
 static void write_error(Sink sink)
 {
     sink_write_str(sink, "ERROR\r\n");
-}
-
-static const char *render_enum(int value, const char *names[], int size)
-{
-    /* Not reenterable! Don't use more than one in one printf */
-    static char buf[10];
-    if (value < size) {
-        return names[value];
-    }
-    sprintf(buf, "? (%d)", value);
-    return buf;
 }
 
 /* 1 if result immediately available,
