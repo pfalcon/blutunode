@@ -60,6 +60,16 @@ static void write_uint32_response(Sink sink, uint32 value)
     sink_write_str(sink, buf);
 }
 
+static void write_response(Sink sink, const char *format, ...)
+{
+    char buf[80];
+    int len;
+    va_list args;
+    va_start(args, format);
+    len = vsprintf(buf, format, args);
+    sink_write(sink, buf, len);
+}
+
 static void write_ok(Sink sink)
 {
     sink_write_str(sink, "OK\r\n");
