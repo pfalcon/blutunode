@@ -13,6 +13,27 @@ const char *render_enum(int value, const char *names[], int size)
     return buf;
 }
 
+static char hexdigit2char(unsigned val)
+{
+  val += '0';
+  if (val > '9') val += 'A' - '0' - 10;
+  return (char)val;
+}
+
+void hexb2str(uint8 val, char *buf)
+{
+  *buf++ = hexdigit2char((val >> 4) & 0xf);
+  *buf++ = hexdigit2char(val & 0xf);
+}
+
+void hexw2str(uint16 val, char *buf)
+{
+  *buf++ = hexdigit2char(val >> 12);
+  *buf++ = hexdigit2char((val >> 8) & 0xf);
+  *buf++ = hexdigit2char((val >> 4) & 0xf);
+  *buf++ = hexdigit2char(val & 0xf);
+}
+
 uint32 get_num_base(const uint8 *s, int len, int base)
 {
     uint32 val;
