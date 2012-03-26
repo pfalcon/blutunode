@@ -128,6 +128,12 @@ static int get_input_reading(Task task, int id, uint16 *value)
     return -1;
 }
 
+void command_ok(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    write_ok(self->sink);
+}
+
 void command_gpio_get(Task task)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;

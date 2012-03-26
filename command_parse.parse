@@ -16,6 +16,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+{ AT \r} : command_ok
+
 { AT + GPIO ? \r} : command_gpio_get
 { AT + GPIO %d:pin ? \r} : command_gpio_pin_get
 { AT + GPIO = %d:mask, %d:bits \r} : command_gpio_set
