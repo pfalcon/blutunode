@@ -47,6 +47,15 @@ static struct InputSource INPUT_NAMES[] = {
     {0}
 };
 
+void process_line(BtNodeCommandTask *task, Sink sink, char *line)
+{
+    sink_write_str(sink, "Received: ");
+    sink_write_str(sink, line);
+    sink_write_str(sink, "\r\n");
+
+    parseData((uint8*)line, (uint8*)line + strlen(line), (Task)task);
+}
+
 void write_uint_response(Sink sink, uint16 value)
 {
     char buf[20];

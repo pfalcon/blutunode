@@ -55,6 +55,7 @@ typedef struct BtNodeCommandTask {
 
 void print_message(MessageId msg_id, Message msg);
 
+void process_line(BtNodeCommandTask *task, Sink sink, char *line);
 void sink_write(Sink sink, const char *buf, int size);
 void sink_write_str(Sink sink, const char *str);
 

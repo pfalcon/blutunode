@@ -39,15 +39,6 @@ void sink_write_str(Sink sink, const char *str)
     sink_write(sink, str, strlen(str));
 }
 
-static void process_line(BtNodeCommandTask *task, Sink sink, char *line)
-{
-    sink_write_str(sink, "Received: ");
-    sink_write_str(sink, line);
-    sink_write_str(sink, "\r\n");
-
-    parseData((uint8*)line, (uint8*)line + strlen(line), (Task)task);
-}
-
 static void handle_input_data(BtNodeCommandTask *self, Source src)
 {
     int size;
