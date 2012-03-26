@@ -1,5 +1,5 @@
 /*
- * BtNode - Bluetooth sensor/actuator node software
+ * BluTuNode - Bluetooth sensor/actuator node software
  * Copyright (c) 2011-2012 Paul Sokolovsky
  *
  * BtNode is free software: you can redistribute it and/or modify
