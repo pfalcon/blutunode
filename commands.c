@@ -56,10 +56,11 @@ static struct InputSource INPUT_NAMES[] = {
 
 void process_line(BtNodeCommandTask *task, Sink sink, char *line)
 {
+#ifdef DEBUG
     sink_write_str(sink, "Received: ");
     sink_write_str(sink, line);
     sink_write_str(sink, "\r\n");
-
+#endif
     parseData((uint8*)line, (uint8*)line + strlen(line), (Task)task);
 }
 
