@@ -18,11 +18,12 @@
 
 #include "btnode.h"
 
-#define HEADER  "BtNode 0.5 Copyright (c)2012 by Paul Sokolovsky\r\n" \
-                "This program is free software; you can redistribute and/or modify it " \
-                "under the terms of the GNU General Public License as published by " \
-                "Free Software Foundation; either version 3 or any later version. " \
-                "This program comes with NO WARRANTY.\r\n"
+#define HEADER \
+"BluTuNode 0.7 Copyright (c)2012 by Paul Sokolovsky\r\n" \
+"This program is free software; you can redistribute and/or modify it\r\n" \
+"under the terms of the GNU General Public License as published by\r\n" \
+"Free Software Foundation; either version 3 or any later version.\r\n" \
+"This program comes with NO WARRANTY.\r\n"
 
 static int input_echo = 1;
 
