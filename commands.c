@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include "btnode.h"
 #include "command_parse.h"
+#include "commands.h"
 #include "utils.h"
 #include <ps.h>
 
@@ -46,21 +47,21 @@ static struct InputSource INPUT_NAMES[] = {
     {0}
 };
 
-static void write_uint_response(Sink sink, uint16 value)
+void write_uint_response(Sink sink, uint16 value)
 {
     char buf[20];
     sprintf(buf, "%u\r\n", value);
     sink_write_str(sink, buf);
 }
 
-static void write_uint32_response(Sink sink, uint32 value)
+void write_uint32_response(Sink sink, uint32 value)
 {
     char buf[20];
     sprintf(buf, "%lu\r\n", value);
     sink_write_str(sink, buf);
 }
 
-static void write_response(Sink sink, const char *format, ...)
+void write_response(Sink sink, const char *format, ...)
 {
     char buf[80];
     int len;
@@ -70,19 +71,19 @@ static void write_response(Sink sink, const char *format, ...)
     sink_write(sink, buf, len);
 }
 
-static void write_ok(Sink sink)
+void write_ok(Sink sink)
 {
     sink_write_str(sink, "OK\r\n");
 }
 
-static void write_ok_uint(Sink sink, uint32 value)
+void write_ok_uint(Sink sink, uint32 value)
 {
     char buf[20];
     sprintf(buf, "OK %lu\r\n", value);
     sink_write_str(sink, buf);
 }
 
-static void write_error(Sink sink)
+void write_error(Sink sink)
 {
     sink_write_str(sink, "ERROR\r\n");
 }
