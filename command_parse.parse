@@ -46,3 +46,5 @@
 { AT + ALLOC ? \r} : command_alloc_get
 { AT + BTVER ? \r} : command_bt_version_get
 { AT + LOCALVER ? \r} : command_local_version_get
+{ AT + VER ? \r} : command_software_version
+{ AT + VERSION ? \r} : command_software_version

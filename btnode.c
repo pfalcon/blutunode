@@ -18,12 +18,7 @@
 
 #include "btnode.h"
 
-#define HEADER \
-"BluTuNode 0.7 Copyright (c)2012 by Paul Sokolovsky\r\n" \
-"This program is free software; you can redistribute and/or modify it\r\n" \
-"under the terms of the GNU General Public License as published by\r\n" \
-"Free Software Foundation; either version 3 or any later version.\r\n" \
-"This program comes with NO WARRANTY.\r\n"
+void command_software_version(Task task);
 
 static int input_echo = 1;
 
@@ -117,7 +112,7 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
         {
             CAST_TYPED_MSG(CL_RFCOMM_CONNECT_CFM, tmsg);
             self->sink = tmsg->sink;
-            sink_write_str(self->sink, HEADER);
+            command_software_version(task);
         }
         break;
     case MESSAGE_MORE_DATA:

@@ -23,6 +23,13 @@
 #include "utils.h"
 #include <ps.h>
 
+const char HEADER[] =
+"BluTuNode 0.7 Copyright (c)2012 by Paul Sokolovsky\r\n"
+"This program is free software; you can redistribute and/or modify\r\n"
+"it under the terms of the GNU General Public License as published\r\n"
+"by Free Software Foundation; either version 3 or any later version.\r\n"
+"This program comes with NO WARRANTY.\r\n";
+
 enum { 
     ADC0 = VM_ADC_SRC_AIO0,
     ADC1 = VM_ADC_SRC_AIO1,
@@ -358,6 +365,13 @@ void command_local_version_handle(BtNodeCommandTask *self, CL_DM_LOCAL_VERSION_C
     sink_write_str(self->sink, buf);
     sprintf(buf, "Manf id: %d\r\n", tmsg->manufacturerName);
     sink_write_str(self->sink, buf);
+}
+
+void command_software_version(Task task)
+{
+    BtNodeCommandTask *self = (BtNodeCommandTask*)task;
+    sink_write(self->sink, HEADER, sizeof(HEADER) - 1);
+    write_ok(self->sink);
 }
 
 void handleUnrecognised(const uint8 *data, uint16 length, Task task)
