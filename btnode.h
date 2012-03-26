@@ -16,7 +16,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*#define DEBUG*/
+
+#ifdef DEBUG
 #define DEBUG_PRINT_ENABLED
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +57,7 @@ typedef struct BtNodeCommandTask {
 #define print_status(status) PRINT(("Status: %d\n", status))
 #define print_bdaddr(bd_addr) PRINT(("Addr=%x:%x:%lx\n", bd_addr.nap, bd_addr.uap, bd_addr.lap))
 
-void print_message(MessageId msg_id, Message msg);
+void dump_message(MessageId msg_id, Message msg);
 
 void process_line(BtNodeCommandTask *task, Sink sink, char *line);
 void sink_write(Sink sink, const char *buf, int size);

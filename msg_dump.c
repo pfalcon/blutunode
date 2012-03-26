@@ -18,6 +18,8 @@
 
 #include "btnode.h"
 
+#ifdef DEBUG
+
 #define MSG_DESC(msg_id, desc) {msg_id, #msg_id, desc}
 static const struct MsgDescription {
     MessageId msg_id;
@@ -41,7 +43,7 @@ static const struct MsgDescription {
     {0}
 };
 
-void print_message(MessageId msg_id, Message msg)
+void dump_message(MessageId msg_id, Message msg)
 {
     const struct MsgDescription *p;
     for (p = MSG_DESCRIPTIONS; p->msg_id; p++) {
@@ -140,3 +142,5 @@ void print_message(MessageId msg_id, Message msg)
         }
     }
 }
+
+#endif

@@ -81,7 +81,9 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 {
     BtNodeCommandTask *self = (BtNodeCommandTask*)task;
 
-    print_message(msg_id, msg);
+#ifdef DEBUG
+    dump_message(msg_id, msg);
+#endif
 
     switch (msg_id) {
     case CL_INIT_CFM:
