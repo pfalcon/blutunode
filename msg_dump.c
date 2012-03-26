@@ -19,7 +19,7 @@
 #include "btnode.h"
 
 #define MSG_DESC(msg_id, desc) {msg_id, #msg_id, desc}
-static struct MsgDescription {
+static const struct MsgDescription {
     MessageId msg_id;
     char *name;
     char *desc;
@@ -43,7 +43,7 @@ static struct MsgDescription {
 
 void print_message(MessageId msg_id, Message msg)
 {
-    struct MsgDescription *p;
+    const struct MsgDescription *p;
     for (p = MSG_DESCRIPTIONS; p->msg_id; p++) {
         if (p->msg_id == msg_id) {
             PRINT(("Message: 0x%x %s (%s)\n", p->msg_id, p->name, p->desc));
