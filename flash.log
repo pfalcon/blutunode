@@ -3,8 +3,8 @@ Running '/BlueLab41/tools/bin/make -R BLUELAB=/BlueLab41/tools -f blutunode.rele
 /BlueLab41/tools/bin/createpath image
 /BlueLab41/tools/bin/copyfile blutunode.app image/vm.app
 /BlueLab41/tools/bin/packfile image image.fs
-/BlueLab41/tools/bin/vmbuilder -size 8192 merge.xpv /BlueLab41/firmware/native/unified/coyote/stack_unsigned.xpv image.fs
-Filesystem uses 37401 words (110055 words of flash left with this firmware)
+/BlueLab41/tools/bin/vmbuilder -size 8192 merge.xpv /BlueLab41/firmware/vm/unified/coyote/stack_unsigned.xpv image.fs
+Filesystem uses 22865 words (124591 words of flash left with this firmware)
 Merged files written to merge
 /BlueLab41/tools/bin/pscli -trans 'SPITRANS=LPT SPIPORT=1' @bcsp @hci_onchip 
 pscli -trans "SPITRANS=LPT SPIPORT=1" @bcsp @hci_onchip : concluded with Success
