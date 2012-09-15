@@ -1,0 +1,29 @@
+<project buildenvironment="{84faf732-1340-4049-9094-244167adf571}" buildenvironmentname="vm" executionenvironmentoption="" buildenvironmentoption="" executionenvironmentname="vm" executionenvironment="{2b2c6868-a56e-4266-962a-cddf1c979343}" >
+ <folder name="C Files" >
+  <extension name="c" />
+  <file path="btnode.c" />
+  <file path="msg_dump.c" />
+  <file path="commands.c" />
+  <file path="utils.c" />
+ </folder>
+ <folder name="Header Files" >
+  <extension name="h" />
+  <file path="btnode.h" />
+  <file path="utils.h" />
+ </folder>
+ <file path="command_parse.parse" />
+ <properties currentconfiguration="Release" >
+  <configuration name="Release" >
+   <property key="buildMatch" >(file):(line):</property>
+   <property key="buildtransport" >0</property>
+   <property key="debugtransport" >[SPITRANS=LPT SPIPORT=1]</property>
+   <property key="defines" ></property>
+   <property key="execution_mode" >1</property>
+   <property key="firmware" >0</property>
+   <property key="libs" >connection_debug,bdaddr</property>
+   <property key="output" ></property>
+   <property key="panic" >0</property>
+   <property key="stacksize" >320</property>
+  </configuration>
+ </properties>
+</project>
