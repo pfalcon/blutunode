@@ -18,7 +18,7 @@
    <property key="buildtransport" >0</property>
    <property key="debugtransport" >[SPITRANS=LPT SPIPORT=1]</property>
    <property key="defines" ></property>
-   <property key="execution_mode" >1</property>
+   <property key="execution_mode" >0</property>
    <property key="firmware" >0</property>
    <property key="libs" >connection_debug,bdaddr</property>
    <property key="output" ></property>
