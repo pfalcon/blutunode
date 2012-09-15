@@ -1,11 +1,69 @@
-Wireless sensor/actuator node software for Bluetooth modules
-============================================================
+BluTuNode - Wireless sensor/actuator node software for Bluetooth modules
+========================================================================
 
 This is experimental firmware for CSR BlueCore based Bluetooth modules
-allowing a host to control most of the I/O aspectes of a module, thus
-allowing for low-cost, flexible, easily accessible solutions for various
-remote control and automation tasks.
-
+allowing a host to control most of the I/O aspects of a module via wireless,
+Bluetooth connection, thus allowing for low-cost, flexible, easily accessible
+solutions for various remote control and automation tasks.
 
 This software is released under the terms if GNU General Public License
 version 3, http://www.gnu.org/copyleft/gpl.html
+
+Status
+------
+
+This application should be considered proof of concept and alpha stage. It did
+not undergo sufficient testing or was used in production setups. If you are
+intrested in this project, please consider testing it, reporting the issues,
+and trying to fix them.
+
+Building
+--------
+
+To build this software, you unfortunately need a propriatary XAP CPU toolchain
+and library from CSR. Prebuilt application files are provided for convenience.
+If you are interested in this project, please consider developing OpenSource
+toolchain for XAP/BleuCore.
+
+Flashing
+--------
+
+To flash this application into a BlueCore module, you need to combine it with
+CSR Bluetooth stack firmware. You can extract such firmware from your module
+or download it from CSR. This project cannot distribute stack firmware or
+combined firmware image due to licensing restrictions. If you are interested
+in this project, please consider developing OpenSource tools to read/write
+module flash and combine firmware images.
+
+Usage
+-----
+
+Once module is programmed and powered on, on the host, as root:
+
+1. Pair the module with your host - use whatever utilities you have and
+know.
+
+2. Find out the Bluetooth address of the module:
+
+# hcitool scan
+Scanning ...
+        xx:xx:xx:xx:xx:xx       linvor
+
+"linvor" is common name in lowe-cost HC-04 modules, your module may have
+another default name.
+
+3. Create RFCOMM devic to communicated with the module:
+
+# rfcomm bind /dev/rfcomm0 xx:xx:xx:xx:xx:xx
+
+4. Connect to the BluTuNode software on the module:
+
+# picocom -b 115200 /dev/rfcomm
+
+There may be delay few seconds before "Terminal ready". Immediately after
+connection, BluTuNode prints GPL notice.
+
+5. At this point, BluTuNode is ready to accept commands, which by common
+convention start with "AT" prefix (case is not important).
+
+6. List and format of support commands can be found in file command_parse.parse
