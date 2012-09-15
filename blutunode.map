@@ -62,7 +62,6 @@
 16 VmSendL2capPrim
 16 VmSendSdpPrim
 16 VmUseExtendedBluestackPrimitives
-38 NativePauseForDebug
 39 VmGetAvailableAllocations
 40 VmGetTemperature
 6 PioGetCts
@@ -73,14 +72,14 @@
 // called functions
 
 // application flash use in decimal words
-code = 34607 const = 2735 header = 24
-Total = 37366
+code = 20071 const = 2735 header = 24
+Total = 22830
 
 // vm version required
 7.5
 
 //total global memory used
-161 words
+159 words
 
 //initialised globals used
 
