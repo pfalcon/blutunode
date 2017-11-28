@@ -1,1 +1,3 @@
+# This attribute tells GitHub to ignore file for the purpose
+# of detecting its programming language.
 /image.fs linguist-vendored
