@@ -1,5 +1,6 @@
 /*
  * BluTuNode - Bluetooth sensor/actuator node software
+ * Copyright (c) 2018 Jacob Schmidt
  * Copyright (c) 2011-2012 Paul Sokolovsky
  *
  * BtNode is free software: you can redistribute it and/or modify
@@ -16,9 +17,34 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <panic.h>
 #include "btnode.h"
 
 void command_software_version(Task task);
+
+static BtNodeCommandTask app;
+
+static const unsigned char spp_service_record [] =
+{
+    0x09, 0x00, 0x01,    /* ServiceClassIDList(0x0001) */
+    0x35, 0x03,          /* DataElSeq 3 bytes */
+    0x19, 0x11, 0x01,    /* UUID 0x1101 for Serial Port */
+    0x09, 0x00, 0x04,    /* ProtocolDescriptorList(0x0004) */
+    0x35, 0x0C,          /* DataElSeq 12 bytes */
+    0x35, 0x03,          /* DataElSeq 3 bytes */
+    0x19, 0x01, 0x00,    /* UUID L2CAP(0x0100) */
+    0x35, 0x05,          /* DataElSeq 5 bytes */
+    0x19, 0x00, 0x03,    /* UUID RFCOMM(0x0003) */
+    0x08, 0x00,          /* uint8 0x00 <- Service Channel - to be over-written */
+    0x09, 0x00, 0x06,    /* LanguageBaseAttributeIDList(0x0006) */
+    0x35, 0x09,          /* DataElSeq 9 bytes */
+    0x09, 0x65, 0x6e,    /* uint16 0x656e */
+    0x09, 0x00, 0x6a,    /* uint16 0x006a */
+    0x09, 0x01, 0x00,    /* uint16 0x0100 */
+    0x09, 0x01, 0x00,    /* ServiceName(0x0100) = "Blutunode SPP" */
+    0x25, 0x0D,          /* String length 13 */
+    'B', 'l', 'u', 't', 'u', 'n', 'o', 'd', 'e', ' ', 'S', 'P', 'P'
+};
 
 static int input_echo = 1;
 
@@ -87,10 +113,8 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 
     switch (msg_id) {
     case CL_INIT_CFM:
+        ConnectionWriteClassOfDevice(0x001F00);
         ConnectionRfcommAllocateChannel(task);
-        break;
-    case CL_RFCOMM_REGISTER_CFM:
-        ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
         break;
     case CL_SM_PIN_CODE_IND:
         {
@@ -98,10 +122,50 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, (uint8*)"1234");
         }
         break;
+
+
+    /* Handle BT2.1 Secure Simple Pairing */
+    case CL_SM_REMOTE_IO_CAPABILITY_IND:
+        {
+            CAST_TYPED_MSG(CL_SM_REMOTE_IO_CAPABILITY_IND, tmsg);
+            app.dev_a.lap = tmsg->bd_addr.lap;
+            app.dev_a.uap = tmsg->bd_addr.uap;
+            app.dev_a.nap = tmsg->bd_addr.nap;
+        }
+        break;
+    case CL_SM_IO_CAPABILITY_REQ_IND:
+        {
+            ConnectionSmIoCapabilityResponse(&app.dev_a, cl_sm_io_cap_no_input_no_output, FALSE, TRUE, FALSE, 0, 0);
+        }
+        break;
+
     case CL_SM_AUTHORISE_IND:
         {
             CAST_TYPED_MSG(CL_SM_AUTHORISE_IND, tmsg);
             ConnectionSmAuthoriseResponse(&tmsg->bd_addr, tmsg->protocol_id, tmsg->channel, tmsg->incoming, TRUE);
+        }
+        break;
+
+
+    /* RFCOMM setup */
+    case CL_RFCOMM_REGISTER_CFM:
+        {
+            CAST_TYPED_MSG(CL_RFCOMM_REGISTER_CFM, tmsg);
+
+            uint8 *service_record = 0;
+            uint16 len_sr = 0;
+            app.rfcomm_channel = tmsg->server_channel;
+
+            len_sr = sizeof(spp_service_record);
+            service_record = (uint8*)PanicUnlessMalloc(len_sr);
+            memcpy(service_record, spp_service_record, len_sr);
+
+            /* Update service record with the registered server channel (just a pointer dereference?) */
+            /* SdpParseInsertRfcommServerChannel(len_sr, service_record, tmsg->server_channel); */
+            service_record[24] = tmsg->server_channel;
+
+            /* Register service record with BlueStack firmware. Don't free the memory! */
+            ConnectionRegisterServiceRecord(task, len_sr, service_record);
         }
         break;
     case CL_RFCOMM_CONNECT_IND:
@@ -117,6 +181,22 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             command_software_version(task);
         }
         break;
+    case CL_SDP_REGISTER_CFM:
+        {
+            /* Make device discoverable */
+            ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
+
+            /* Register SDP record. Linux can handle working at the RFCOMM level, but Windows depends
+               on having an SDP record that it can browse to determin if SPP is available */
+            ConnectionSmRegisterIncomingService(protocol_rfcomm, app.rfcomm_channel, secl_none);
+
+            /* Turn off security for SDP browsing */
+            ConnectionSmSetSdpSecurityIn(TRUE);
+        }
+        break;
+
+
+    /* Handle data messages */
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
@@ -162,9 +242,9 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 
 int main(void)
 {
-    static BtNodeCommandTask app;
     app.task.handler = task_handler;
     app.buf_ptr = app.input_buf;
+    ConnectionSmDeleteAllAuthDevices(0); /* Our module will not remember pairing */
     MessagePioTask(&app.task);
     ConnectionInit(&app.task);
 
