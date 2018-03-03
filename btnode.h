@@ -49,6 +49,7 @@ typedef struct BtNodeCommandTask {
     struct InputSource *poll_source;
     int poll_period;
     bdaddr dev_a;
+    uint8 rfcomm_channel;
 } BtNodeCommandTask;
 
 /* Periodical poll message */
