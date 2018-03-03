@@ -1,5 +1,6 @@
 /*
  * BluTuNode - Bluetooth sensor/actuator node software
+ * Copyright (c) 2018 Jacob Schmidt
  * Copyright (c) 2011-2012 Paul Sokolovsky
  *
  * BtNode is free software: you can redistribute it and/or modify
@@ -19,6 +20,8 @@
 #include "btnode.h"
 
 void command_software_version(Task task);
+
+static BtNodeCommandTask app;
 
 static int input_echo = 1;
 
@@ -89,20 +92,40 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
     case CL_INIT_CFM:
         ConnectionRfcommAllocateChannel(task);
         break;
-    case CL_RFCOMM_REGISTER_CFM:
-        ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
-        break;
     case CL_SM_PIN_CODE_IND:
         {
             CAST_TYPED_MSG(CL_SM_PIN_CODE_IND, tmsg);
             ConnectionSmPinCodeResponse(&tmsg->bd_addr, 4, (uint8*)"1234");
         }
         break;
+
+
+    /* Handle BT2.1 Secure Simple Pairing */
+    case CL_SM_REMOTE_IO_CAPABILITY_IND:
+        {
+            CAST_TYPED_MSG(CL_SM_REMOTE_IO_CAPABILITY_IND, tmsg);
+            app.dev_a.lap = tmsg->bd_addr.lap;
+            app.dev_a.uap = tmsg->bd_addr.uap;
+            app.dev_a.nap = tmsg->bd_addr.nap;
+        }
+        break;
+    case CL_SM_IO_CAPABILITY_REQ_IND:
+        {
+            ConnectionSmIoCapabilityResponse(&app.dev_a, cl_sm_io_cap_no_input_no_output, FALSE, TRUE, FALSE, 0, 0);
+        }
+        break;
+
     case CL_SM_AUTHORISE_IND:
         {
             CAST_TYPED_MSG(CL_SM_AUTHORISE_IND, tmsg);
             ConnectionSmAuthoriseResponse(&tmsg->bd_addr, tmsg->protocol_id, tmsg->channel, tmsg->incoming, TRUE);
         }
+        break;
+
+
+    /* RFCOMM setup */
+    case CL_RFCOMM_REGISTER_CFM:
+        ConnectionWriteScanEnable(hci_scan_enable_inq_and_page);
         break;
     case CL_RFCOMM_CONNECT_IND:
         {
@@ -117,6 +140,9 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
             command_software_version(task);
         }
         break;
+
+
+    /* Handle data messages */
     case MESSAGE_MORE_DATA:
         {
             MessageMoreData *tmsg = (MessageMoreData*)msg;
@@ -162,9 +188,9 @@ static void task_handler(Task task, MessageId msg_id, Message msg)
 
 int main(void)
 {
-    static BtNodeCommandTask app;
     app.task.handler = task_handler;
     app.buf_ptr = app.input_buf;
+    ConnectionSmDeleteAllAuthDevices(0); /* Our module will not remember pairing */
     MessagePioTask(&app.task);
     ConnectionInit(&app.task);
 

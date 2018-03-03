@@ -1,5 +1,6 @@
 /*
  * BluTuNode - Bluetooth sensor/actuator node software
+ * Copyright (c) 2018 Jacob Schmidt
  * Copyright (c) 2011-2012 Paul Sokolovsky
  *
  * BtNode is free software: you can redistribute it and/or modify
@@ -47,6 +48,7 @@ typedef struct BtNodeCommandTask {
     char *buf_ptr;
     struct InputSource *poll_source;
     int poll_period;
+    bdaddr dev_a;
 } BtNodeCommandTask;
 
 /* Periodical poll message */
